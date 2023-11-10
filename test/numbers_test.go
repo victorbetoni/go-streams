@@ -32,3 +32,37 @@ func TestFilterFunction(t *testing.T) {
 
 	compareSlices(*slice, expected, t)
 }
+
+func TestJoinFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := []int{1, 10, 2, 10, 3, 10, 4, 10, 5, 10, 6}
+
+	slice := streams.StreamOf[int](input).Join(10).ToSlice()
+
+	compareSlices(*slice, expected, t)
+}
+
+func TestReduceFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := 1 + 2 + 3 + 4 + 5 + 6
+
+	reducted := streams.StreamOf[int](input).Reduce(0, func(e1, e2 int) int { return e1 + e2 })
+
+	if expected != *reducted {
+		t.Errorf("reducing gone wrong. expected %d and got %d", expected, *reducted)
+	}
+}
+
+func TestAnyMatchFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := true
+	filter := func(val int) bool {
+		return val == 3
+	}
+
+	result := streams.StreamOf[int](input).AnyMatch(filter)
+
+	if expected != result {
+		t.Errorf("expected %v and got %v", expected, result)
+	}
+}

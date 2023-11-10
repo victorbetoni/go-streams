@@ -9,7 +9,7 @@ func compareSlices[E comparable](s1 []E, expected []E, t *testing.T) {
 
 	for i, val := range s1 {
 		if val != expected[i] {
-			t.Errorf("error in position %d. Expected %s and got %s", i, val, expected[i])
+			t.Errorf("error in position %d. Expected %v and got %v", i, val, expected[i])
 		}
 	}
 }
