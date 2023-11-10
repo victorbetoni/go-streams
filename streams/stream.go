@@ -1,53 +1,62 @@
 package streams
 
+type Predicate func(any) bool
+type Function func(any) any
+
 type Stream[E any] struct {
-	Current *[]E
+	Current []E
 }
 
 func StreamOf[E any](slice []E) *Stream[E] {
 	return &Stream[E]{
-		Current: &slice,
+		Current: slice,
 	}
 }
 
-func Map[T, E any](stream *Stream[T], mapper func(T) E) *Stream[E] {
-	slice := make([]E, 0)
-	for _, val := range *stream.Current {
+func Map[E, V any](stream *Stream[E], mapper func(E) V) *Stream[V] {
+	slice := make([]V, 0)
+	for _, val := range stream.Current {
 		slice = append(slice, mapper(val))
 	}
-	return StreamOf[E](slice)
+	return StreamOf[V](slice)
 }
 
-func Filter[T any](stream *Stream[T], filter func(T) bool) *Stream[T] {
-	slice := make([]T, 0)
-	for _, val := range *stream.Current {
+func (s *Stream[E]) Filter(filter func(E) bool) *Stream[E] {
+	slice := make([]E, 0)
+	for _, val := range s.Current {
 		if filter(val) {
 			slice = append(slice, val)
 		}
 	}
-	return StreamOf[T](slice)
+	return StreamOf[E](slice)
 }
 
-func Join[T any](stream *Stream[T], joined T) *Stream[T] {
-	slice := make([]T, 0)
-	for i, val := range *stream.Current {
+func (s *Stream[E]) ForEach(consumer func(E)) {
+	for _, val := range s.Current {
+		consumer(val)
+	}
+}
+
+func (s *Stream[E]) Join(joined E) *Stream[E] {
+	slice := make([]E, 0)
+	for i, val := range s.Current {
 		slice = append(slice, val)
-		if i != len(*stream.Current)-1 {
+		if i != len(s.Current)-1 {
 			slice = append(slice, joined)
 		}
 	}
-	return StreamOf[T](slice)
+	return StreamOf[E](slice)
 }
 
-func Reduce[T any](stream *Stream[T], initial T, reductor func(T, T) T) *T {
-	for _, val := range *stream.Current {
-		initial = reductor(initial, val)
+func (s *Stream[E]) Reduce(identity E, reductor func(E, E) E) *E {
+	for _, val := range s.Current {
+		identity = reductor(identity, val)
 	}
-	return &initial
+	return &identity
 }
 
-func AnyMatch[T any](stream *Stream[T], predicate func(T) bool) bool {
-	for _, val := range *stream.Current {
+func (s *Stream[E]) AnyMatch(predicate func(E) bool) bool {
+	for _, val := range s.Current {
 		if predicate(val) {
 			return true
 		}
@@ -55,14 +64,34 @@ func AnyMatch[T any](stream *Stream[T], predicate func(T) bool) bool {
 	return false
 }
 
-func NoneMatch[T any](stream *Stream[T], predicate func(T) bool) bool {
-	return !AnyMatch[T](stream, predicate)
+func (s *Stream[E]) NoneMatch(predicate func(E) bool) bool {
+	return !s.AnyMatch(predicate)
+}
+
+func (s *Stream[E]) AllMatch(predicate func(E) bool) bool {
+	for _, val := range s.Current {
+		if !predicate(val) {
+			return false
+		}
+	}
+	return true
+}
+
+func (s *Stream[E]) FindFirst() *E {
+	if len(s.Current) < 1 {
+		return nil
+	}
+	return &s.Current[0]
 }
 
 func ToMap[T comparable, V any](stream *Stream[T], mapper func(T) V) map[T]V {
-	m := make(map[T]V, len(*stream.Current))
-	for _, val := range *stream.Current {
+	m := make(map[T]V, len(stream.Current))
+	for _, val := range stream.Current {
 		m[val] = mapper(val)
 	}
 	return m
+}
+
+func (s *Stream[E]) ToSlice() *[]E {
+	return &s.Current
 }

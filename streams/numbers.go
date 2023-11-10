@@ -20,80 +20,80 @@ type NumberStream[E Number] struct {
 	Stream[E]
 }
 
-func Sum[E Number](stream *NumberStream[E]) E {
+func (n *NumberStream[E]) Sum() E {
 	var identity E
 	switch any(identity).(type) {
 	case float64, float32:
-		return *Reduce[E](&stream.Stream, 0.0, func(e1, e2 E) E { return e1 + e2 })
+		return *n.Reduce(0.0, func(e1, e2 E) E { return e1 + e2 })
 	case complex64, complex128:
-		return *Reduce[E](&stream.Stream, complex(0, 0), func(e1, e2 E) E { return e1 + e2 })
+		return *n.Reduce(complex(0, 0), func(e1, e2 E) E { return e1 + e2 })
 	default:
-		return *Reduce[E](&stream.Stream, 0, func(e1, e2 E) E { return e1 + e2 })
+		return *n.Reduce(0, func(e1, e2 E) E { return e1 + e2 })
 	}
 }
 
-func MapToFloat32[T any](stream *Stream[T], predicate func(T) float32) *NumberStream[float32] {
-	return mapToNumber[T, float32](stream, predicate)
+func (n *Stream[E]) MapToFloat32(mapper func(E) float32) *NumberStream[float32] {
+	return mapToNumber[E, float32](n, mapper)
 }
 
-func MapToFloat64[T any](stream *Stream[T], predicate func(T) float64) *NumberStream[float64] {
-	return mapToNumber[T, float64](stream, predicate)
+func (n *Stream[E]) MapToFloat64(mapper func(E) float64) *NumberStream[float64] {
+	return mapToNumber[E, float64](n, mapper)
 }
 
-func MapToInt[T any](stream *Stream[T], predicate func(T) int) *NumberStream[int] {
-	return mapToNumber[T, int](stream, predicate)
+func (n *Stream[E]) MapToInt(mapper func(E) int) *NumberStream[int] {
+	return mapToNumber[E, int](n, mapper)
 }
 
-func MapToInt8[T any](stream *Stream[T], predicate func(T) int8) *NumberStream[int8] {
-	return mapToNumber[T, int8](stream, predicate)
+func (n *Stream[E]) MapToInt8(mapper func(E) int8) *NumberStream[int8] {
+	return mapToNumber[E, int8](n, mapper)
 }
 
-func MapToInt16[T any](stream *Stream[T], predicate func(T) int16) *NumberStream[int16] {
-	return mapToNumber[T, int16](stream, predicate)
+func (n *Stream[E]) MapToInt16(mapper func(E) int16) *NumberStream[int16] {
+	return mapToNumber[E, int16](n, mapper)
 }
 
-func MapToInt32[T any](stream *Stream[T], predicate func(T) int32) *NumberStream[int32] {
-	return mapToNumber[T, int32](stream, predicate)
+func (n *Stream[E]) MapToInt32(mapper func(E) int32) *NumberStream[int32] {
+	return mapToNumber[E, int32](n, mapper)
 }
 
-func MapToInt64[T any](stream *Stream[T], predicate func(T) int64) *NumberStream[int64] {
-	return mapToNumber[T, int64](stream, predicate)
+func (n *Stream[E]) MapToInt64(mapper func(E) int64) *NumberStream[int64] {
+	return mapToNumber[E, int64](n, mapper)
 }
 
-func MapToUint[T any](stream *Stream[T], predicate func(T) uint) *NumberStream[uint] {
-	return mapToNumber[T, uint](stream, predicate)
+func (n *Stream[E]) MapToUint(mapper func(E) uint) *NumberStream[uint] {
+	return mapToNumber[E, uint](n, mapper)
 }
 
-func MapToUint8[T any](stream *Stream[T], predicate func(T) uint8) *NumberStream[uint8] {
-	return mapToNumber[T, uint8](stream, predicate)
+func (n *Stream[E]) MapToUint8(mapper func(E) uint8) *NumberStream[uint8] {
+	return mapToNumber[E, uint8](n, mapper)
 }
 
-func MapToUint16[T any](stream *Stream[T], predicate func(T) uint16) *NumberStream[uint16] {
-	return mapToNumber[T, uint16](stream, predicate)
+func (n *Stream[E]) MapToUint16(mapper func(E) uint16) *NumberStream[uint16] {
+	return mapToNumber[E, uint16](n, mapper)
 }
 
-func MapToUint32[T any](stream *Stream[T], predicate func(T) uint32) *NumberStream[uint32] {
-	return mapToNumber[T, uint32](stream, predicate)
+func (n *Stream[E]) MapToUint32(mapper func(E) uint32) *NumberStream[uint32] {
+	return mapToNumber[E, uint32](n, mapper)
 }
 
-func MapToUint64[T any](stream *Stream[T], predicate func(T) uint64) *NumberStream[uint64] {
-	return mapToNumber[T, uint64](stream, predicate)
+func (n *Stream[E]) MapToUint64(mapper func(E) uint64) *NumberStream[uint64] {
+	return mapToNumber[E, uint64](n, mapper)
 }
 
-func MapToComplex64[T any](stream *Stream[T], predicate func(T) complex64) *NumberStream[complex64] {
-	return mapToNumber[T, complex64](stream, predicate)
+func (n *Stream[E]) MapToComplex64(mapper func(E) complex64) *NumberStream[complex64] {
+	return mapToNumber[E, complex64](n, mapper)
 }
 
-func MapToUintptr[T any](stream *Stream[T], predicate func(T) uintptr) *NumberStream[uintptr] {
-	return mapToNumber[T, uintptr](stream, predicate)
+func (n *Stream[E]) MapToUintptr(mapper func(E) uintptr) *NumberStream[uintptr] {
+	return mapToNumber[E, uintptr](n, mapper)
 }
 
 func mapToNumber[E any, T Number](stream *Stream[E], mapper func(E) T) *NumberStream[T] {
-	numbers := make([]T, len(*stream.Current))
-	for i, val := range *stream.Current {
+	numbers := make([]T, len(stream.Current))
+	for i, val := range stream.Current {
 		numbers[i] = mapper(val)
 	}
 	return &NumberStream[T]{
-		Stream: Stream[T]{Current: &numbers},
+		Stream: Stream[T]{Current: numbers},
 	}
 }
