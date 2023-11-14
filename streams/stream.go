@@ -1,5 +1,7 @@
 package streams
 
+import "github.com/victorbetoni/go-streams/sort"
+
 type Predicate func(any) bool
 type Function func(any) any
 
@@ -10,6 +12,13 @@ type Stream[E any] struct {
 func StreamOf[E any](slice []E) *Stream[E] {
 	return &Stream[E]{
 		Current: slice,
+	}
+}
+
+func Empty[E any]() *Stream[E] {
+	s := make([]E, 0)
+	return &Stream[E]{
+		Current: s,
 	}
 }
 
@@ -46,6 +55,34 @@ func (s *Stream[E]) Join(joined E) *Stream[E] {
 		}
 	}
 	return StreamOf[E](slice)
+}
+
+func (s *Stream[E]) Skip(n int) *Stream[E] {
+	if len(s.Current) <= n {
+		return Empty[E]()
+	}
+	return StreamOf[E](s.Current[n:])
+}
+
+func (s *Stream[E]) Limit(n int) *Stream[E] {
+	if len(s.Current) <= n {
+		return StreamOf[E](s.Current)
+	}
+	return StreamOf[E](s.Current[:n+1])
+}
+
+func (s *Stream[E]) Sorted(comparator func(e1, e2 E) int) *Stream[E] {
+	arr := sort.QuickSort[E](s.Current, comparator, 0, len(s.Current)-1)
+	return StreamOf[E](arr)
+}
+
+func (s *Stream[E]) Reversed() *Stream[E] {
+	upper, lower, i := len(s.Current)-1, 0, 0
+	for j := lower; j < upper; j++ {
+		s.Current[i], s.Current[j] = s.Current[j], s.Current[i]
+		i++
+	}
+	return StreamOf[E](s.Current)
 }
 
 func (s *Stream[E]) Reduce(identity E, reductor func(E, E) E) *E {
