@@ -26,20 +26,8 @@ func Empty[E any]() *Stream[E] {
 	}
 }
 
-func Map[E, V any](stream *Stream[E], mapper func(E) V) *Stream[V] {
-	slice := make([]V, 0)
-	for _, val := range stream.Current {
-		slice = append(slice, mapper(val))
-	}
-	return StreamOf[V](slice)
-}
-
-func FlatMap[E, V any](stream *Stream[E], mapper func(E) []V) *Stream[V] {
-	slice := make([]V, 0)
-	for _, val := range stream.Current {
-		slice = append(slice, mapper(val)...)
-	}
-	return StreamOf[V](slice)
+func (s *Stream[E]) Lenght() int {
+	return len(s.Current)
 }
 
 func (s *Stream[E]) Filter(filter func(E) bool) *Stream[E] {
