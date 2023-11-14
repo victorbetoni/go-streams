@@ -15,8 +15,8 @@ func SliceIterator[E any](slice *[]E) *Iterator[E] {
 func StreamIterator[E any](stream *streams.Stream[E]) *Iterator[E] {
 	return &Iterator[E]{
 		collection: stream.Current,
-		Current:    &stream.Current[0],
-		Index:      0,
+		Current:    nil,
+		Index:      -1,
 	}
 }
 
@@ -44,4 +44,10 @@ func (i *Iterator[E]) Previous() bool {
 	i.Index--
 	i.Current = &i.collection[i.Index]
 	return true
+}
+
+func (i *Iterator[E]) ForEachRemaning(do func(*E)) {
+	for i.Next() {
+		do(i.Current)
+	}
 }
