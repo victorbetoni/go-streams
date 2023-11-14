@@ -1,6 +1,10 @@
 package streams
 
-import "github.com/victorbetoni/go-streams/sort"
+import (
+	"math"
+
+	"github.com/victorbetoni/go-streams/sort"
+)
 
 type Predicate func(any) bool
 type Function func(any) any
@@ -77,10 +81,10 @@ func (s *Stream[E]) Sorted(comparator func(e1, e2 E) int) *Stream[E] {
 }
 
 func (s *Stream[E]) Reversed() *Stream[E] {
-	upper, lower, i := len(s.Current)-1, 0, 0
-	for j := lower; j < upper; j++ {
-		s.Current[i], s.Current[j] = s.Current[j], s.Current[i]
-		i++
+	upper, lower := len(s.Current)-1, 0
+	d := int(math.Floor(float64(len(s.Current)) / 2))
+	for i := 0; i < d; i++ {
+		s.Current[upper-i], s.Current[lower+i] = s.Current[lower+i], s.Current[upper-i]
 	}
 	return StreamOf[E](s.Current)
 }

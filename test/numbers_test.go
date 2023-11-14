@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/victorbetoni/go-streams/comparators"
 	"github.com/victorbetoni/go-streams/streams"
 )
 
@@ -65,4 +66,40 @@ func TestAnyMatchFunction(t *testing.T) {
 	if expected != result {
 		t.Errorf("expected %v and got %v", expected, result)
 	}
+}
+
+func TestReversedFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := []int{6, 5, 4, 3, 2, 1}
+
+	result := streams.StreamOf[int](input).Reversed()
+
+	compareSlices(result.Current, expected, t)
+}
+
+func TestSortedFunction(t *testing.T) {
+	input := []int{7, 3, 6, 2, 0, 5}
+	expected := []int{0, 2, 3, 5, 6, 7}
+
+	result := streams.StreamOf[int](input).Sorted(comparators.CompareInt)
+
+	compareSlices(result.Current, expected, t)
+}
+
+func TestSkipFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := []int{3, 4, 5, 6}
+
+	result := streams.StreamOf[int](input).Skip(2)
+
+	compareSlices(result.Current, expected, t)
+}
+
+func TestLimitFunction(t *testing.T) {
+	input := []int{1, 2, 3, 4, 5, 6}
+	expected := []int{1, 2, 3}
+
+	result := streams.StreamOf[int](input).Limit(3)
+
+	compareSlices(result.Current, expected, t)
 }
