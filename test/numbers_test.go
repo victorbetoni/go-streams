@@ -16,11 +16,18 @@ func TestMapFunction(t *testing.T) {
 		return fmt.Sprintf("%d", i)
 	}).ToSlice()
 
-	for i, val := range *slice {
-		if val != expected[i] {
-			t.Errorf("error in position %d. Expected %s and got %s", i, val, expected[i])
-		}
-	}
+	compareSlices[string](*slice, expected, t)
+}
+
+func TestFlatMapFunction(t *testing.T) {
+	input := []string{"ab", "cd", "ef"}
+	expected := []rune{'a', 'b', 'c', 'd', 'e', 'f'}
+
+	slice := streams.FlatMap[string, rune](streams.StreamOf[string](input), func(i string) []rune {
+		return []rune(i)
+	}).ToSlice()
+
+	compareSlices[rune](*slice, expected, t)
 }
 
 func TestFilterFunction(t *testing.T) {
