@@ -110,3 +110,33 @@ func TestLimitFunction(t *testing.T) {
 
 	compareSlices(result.Current, expected, t)
 }
+
+func TestZipFunction(t *testing.T) {
+	input := []int{1, 2, 3}
+	input2 := []string{"one", "two", "three"}
+	expected := []string{"1:one", "2:two", "3:three"}
+	zipper := func(i1 int, i2 string) string {
+		return fmt.Sprintf("%d:%s", i1, i2)
+	}
+
+	s1 := streams.StreamOf[int](input)
+	s2 := streams.StreamOf[string](input2)
+	s3 := streams.Zip[int, string, string](s1, s2, zipper)
+
+	compareSlices(s3.Current, expected, t)
+}
+
+func TestZipToTupleFunction(t *testing.T) {
+	input := []int{1, 2, 3}
+	input2 := []string{"one", "two", "three"}
+	expected := []string{"1:one", "2:two", "3:three"}
+	zipper := func(i1 int, i2 string) string {
+		return fmt.Sprintf("%d:%s", i1, i2)
+	}
+
+	s1 := streams.StreamOf[int](input)
+	s2 := streams.StreamOf[string](input2)
+	s3 := streams.Zip[int, string, string](s1, s2, zipper)
+
+	compareSlices(s3.Current, expected, t)
+}
