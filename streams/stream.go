@@ -13,7 +13,7 @@ type Stream[E any] struct {
 	Current []E
 }
 
-func StreamOf[E any](slice []E) *Stream[E] {
+func StreamOf[E any](slice ...E) *Stream[E] {
 	return &Stream[E]{
 		Current: slice,
 	}
@@ -37,7 +37,7 @@ func (s *Stream[E]) Filter(filter func(E) bool) *Stream[E] {
 			slice = append(slice, val)
 		}
 	}
-	return StreamOf[E](slice)
+	return StreamOf[E](slice...)
 }
 
 func (s *Stream[E]) ForEach(consumer func(E)) {
@@ -54,26 +54,26 @@ func (s *Stream[E]) Join(joined E) *Stream[E] {
 			slice = append(slice, joined)
 		}
 	}
-	return StreamOf[E](slice)
+	return StreamOf[E](slice...)
 }
 
 func (s *Stream[E]) Skip(n int) *Stream[E] {
 	if len(s.Current) <= n {
 		return Empty[E]()
 	}
-	return StreamOf[E](s.Current[n:])
+	return StreamOf[E](s.Current[n:]...)
 }
 
 func (s *Stream[E]) Limit(n int) *Stream[E] {
 	if len(s.Current) <= n {
-		return StreamOf[E](s.Current)
+		return StreamOf[E](s.Current...)
 	}
-	return StreamOf[E](s.Current[:n+1])
+	return StreamOf[E](s.Current[:n+1]...)
 }
 
 func (s *Stream[E]) Sorted(comparator func(e1, e2 E) int) *Stream[E] {
 	arr := sort.QuickSort[E](s.Current, comparator, 0, len(s.Current)-1)
-	return StreamOf[E](arr)
+	return StreamOf[E](arr...)
 }
 
 func (s *Stream[E]) Reversed() *Stream[E] {
@@ -82,7 +82,7 @@ func (s *Stream[E]) Reversed() *Stream[E] {
 	for i := 0; i < d; i++ {
 		s.Current[upper-i], s.Current[lower+i] = s.Current[lower+i], s.Current[upper-i]
 	}
-	return StreamOf[E](s.Current)
+	return StreamOf[E](s.Current...)
 }
 
 func (s *Stream[E]) Reduce(identity E, reductor func(E, E) E) *E {

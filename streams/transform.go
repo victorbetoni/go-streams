@@ -11,7 +11,7 @@ func Map[E, V any](stream *Stream[E], mapper func(E) V) *Stream[V] {
 	for _, val := range stream.Current {
 		slice = append(slice, mapper(val))
 	}
-	return StreamOf[V](slice)
+	return StreamOf[V](slice...)
 }
 
 func FlatMap[E, V any](stream *Stream[E], mapper func(E) []V) *Stream[V] {
@@ -19,7 +19,7 @@ func FlatMap[E, V any](stream *Stream[E], mapper func(E) []V) *Stream[V] {
 	for _, val := range stream.Current {
 		slice = append(slice, mapper(val)...)
 	}
-	return StreamOf[V](slice)
+	return StreamOf[V](slice...)
 }
 
 func Zip[E, V, T any](s1 *Stream[E], s2 *Stream[V], zipper func(E, V) T) *Stream[T] {
@@ -36,7 +36,7 @@ func Zip[E, V, T any](s1 *Stream[E], s2 *Stream[V], zipper func(E, V) T) *Stream
 		}
 		s = append(s, zipper(v1, v2))
 	}
-	return StreamOf[T](s)
+	return StreamOf[T](s...)
 }
 
 func ZipToTuples[E, V any](s1 *Stream[E], s2 *Stream[V]) *Stream[tuples.Tuple2S[E, V]] {
@@ -53,5 +53,5 @@ func ZipToTuples[E, V any](s1 *Stream[E], s2 *Stream[V]) *Stream[tuples.Tuple2S[
 		}
 		s = append(s, tuples.Tuple2[E, V](v1, v2))
 	}
-	return StreamOf[tuples.Tuple2S[E, V]](s)
+	return StreamOf[tuples.Tuple2S[E, V]](s...)
 }
