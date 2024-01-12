@@ -30,6 +30,15 @@ func (s *Stream[E]) Lenght() int {
 	return len(s.Current)
 }
 
+func (s *Stream[E]) FindIndex(filter func(E) bool) int {
+	for i, val := range s.Current {
+		if filter(val) {
+			return i
+		}
+	}
+	return -1
+}
+
 func (s *Stream[E]) Filter(filter func(E) bool) *Stream[E] {
 	slice := make([]E, 0)
 	for _, val := range s.Current {
