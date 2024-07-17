@@ -2,6 +2,7 @@ package streams
 
 import (
 	"math"
+	"reflect"
 
 	"github.com/victorbetoni/go-streams/sort"
 )
@@ -128,6 +129,12 @@ func (s *Stream[E]) FindFirst() *E {
 		return nil
 	}
 	return &s.Current[0]
+}
+
+func (s *Stream[E]) Contains(e E) bool {
+	return s.FindIndex(func(el E) bool {
+		return reflect.DeepEqual(el, e)
+	}) != -1
 }
 
 func ToMap[T comparable, V any](stream *Stream[T], mapper func(T) V) map[T]V {
